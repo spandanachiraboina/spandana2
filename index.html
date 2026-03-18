@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Noir & Gold — Fine Dining</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #8A6E2F;
+      --charcoal: #0D0D0D;
+      --charcoal-2: #141414;
+      --charcoal-3: #1C1C1C;
+      --charcoal-4: #242424;
+      --cream: #F5EDD8;
+      --cream-dim: #B8A88A;
+      --white: #FAFAFA;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--charcoal);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── CURSOR ── */
+    * { cursor: none !important; }
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transition: transform 0.15s ease;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s;
+      opacity: 0.5;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 28px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.4s, padding 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(13,13,13,0.96);
+      backdrop-filter: blur(12px);
+      padding: 18px 60px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-logo span { font-style: italic; color: var(--cream); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--cream-dim);
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-reserve {
+      padding: 10px 24px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .nav-reserve:hover {
+      background: var(--gold);
+      color: var(--charcoal);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      height: 100vh;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 60% at 50% 60%, rgba(201,168,76,0.08) 0%, transparent 70%),
+        linear-gradient(160deg, #0D0D0D 0%, #1a1208 50%, #0D0D0D 100%);
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(201,168,76,0.03) 80px, rgba(201,168,76,0.03) 81px),
+        repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(201,168,76,0.03) 80px, rgba(201,168,76,0.03) 81px);
+    }
+    .hero-content {
+      text-align: center; z-index: 1; padding: 0 20px;
+      animation: heroFade 1.2s ease forwards;
+      opacity: 0;
+    }
+    @keyframes heroFade {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+      display: block;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      font-weight: 900;
+      line-height: 0.92;
+      margin-bottom: 8px;
+      color: var(--cream);
+    }
+    .hero-title em {
+      display: block;
+      font-style: italic;
+      color: var(--gold);
+      font-size: clamp(3rem, 7vw, 6.5rem);
+    }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      font-style: italic;
+      color: var(--cream-dim);
+      margin: 28px 0 48px;
+      letter-spacing: 0.05em;
+    }
+    .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 16px 40px;
+      background: var(--gold);
+      color: var(--charcoal);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--gold-light);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .btn-primary:hover::before { transform: translateX(0); }
+    .btn-primary span { position: relative; z-index: 1; }
+    .btn-outline {
+      padding: 16px 40px;
+      border: 1px solid rgba(201,168,76,0.5);
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      z-index: 1;
+    }
+    .hero-scroll span {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold-dim), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* ── DIVIDER ── */
+    .ornament {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; margin: 0 auto;
+    }
+    .ornament-line { flex: 1; max-width: 120px; height: 1px; background: linear-gradient(to right, transparent, var(--gold-dim)); }
+    .ornament-line.rev { background: linear-gradient(to left, transparent, var(--gold-dim)); }
+    .ornament-diamond {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg);
+    }
+
+    /* ── ABOUT STRIP ── */
+    .about-strip {
+      background: var(--charcoal-2);
+      border-top: 1px solid rgba(201,168,76,0.1);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      padding: 28px 60px;
+      display: flex; align-items: center; gap: 60px;
+      overflow: hidden;
+    }
+    .strip-item {
+      display: flex; align-items: center; gap: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .strip-icon { font-size: 1.1rem; }
+    .strip-text {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+    .strip-sep { color: var(--gold-dim); font-size: 0.6rem; }
+
+    /* ── SECTION ── */
+    section { padding: 120px 60px; }
+    .section-tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block; margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 28px;
+      color: var(--cream);
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .section-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: var(--cream-dim);
+      max-width: 600px;
+    }
+
+    /* ── STORY ── */
+    .story { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; max-width: 1300px; margin: 0 auto; }
+    .story-visual {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: var(--charcoal-3);
+      overflow: hidden;
+    }
+    .story-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(circle at 40% 40%, rgba(201,168,76,0.12) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .story-visual-inner {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 8rem;
+      font-weight: 900;
+      color: rgba(201,168,76,0.06);
+      user-select: none;
+    }
+    .story-frame {
+      position: absolute;
+      bottom: -20px; right: -20px;
+      width: calc(100% - 40px);
+      height: calc(100% - 40px);
+      border: 1px solid rgba(201,168,76,0.25);
+      pointer-events: none;
+    }
+    .story-badge {
+      position: absolute;
+      bottom: 24px; left: 24px;
+      background: var(--charcoal);
+      border: 1px solid rgba(201,168,76,0.3);
+      padding: 16px 20px;
+    }
+    .story-badge-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .story-badge-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+    .story-chef {
+      display: flex; align-items: center; gap: 14px;
+      margin-top: 40px; padding-top: 32px;
+      border-top: 1px solid rgba(201,168,76,0.15);
+    }
+    .chef-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--charcoal-3);
+      border: 1px solid rgba(201,168,76,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .chef-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+    .chef-title {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+
+    /* ── FEATURED MENU ── */
+    .featured { background: var(--charcoal-2); }
+    .featured-inner { max-width: 1300px; margin: 0 auto; }
+    .featured-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 70px; }
+    .featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .dish-card {
+      background: var(--charcoal-3);
+      position: relative; overflow: hidden;
+      aspect-ratio: 4/5;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      transition: transform 0.4s ease;
+    }
+    .dish-card:hover { transform: translateY(-6px); }
+    .dish-card:hover .dish-overlay { opacity: 1; }
+    .dish-emoji {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      transition: transform 0.4s ease;
+    }
+    .dish-card:hover .dish-emoji { transform: scale(1.1); }
+    .dish-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(13,13,13,0.95) 0%, rgba(13,13,13,0.3) 60%, transparent 100%);
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+    .dish-info {
+      position: relative; z-index: 1;
+      padding: 28px;
+    }
+    .dish-cat {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .dish-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .dish-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--gold-light);
+      font-style: italic;
+    }
+    .dish-card.featured-big {
+      grid-row: span 1;
+      aspect-ratio: auto;
+      min-height: 400px;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials { max-width: 900px; margin: 0 auto; text-align: center; }
+    .quotes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; margin-top: 70px; }
+    .quote-card {
+      padding: 32px;
+      border: 1px solid rgba(201,168,76,0.12);
+      background: var(--charcoal-2);
+      text-align: left;
+      transition: border-color 0.3s;
+    }
+    .quote-card:hover { border-color: rgba(201,168,76,0.35); }
+    .quote-stars { color: var(--gold); font-size: 0.7rem; letter-spacing: 4px; margin-bottom: 16px; }
+    .quote-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--cream-dim);
+      margin-bottom: 20px;
+    }
+    .quote-author { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-dim); }
+
+    /* ── RESERVATION BAND ── */
+    .reserve-band {
+      background: var(--gold);
+      padding: 80px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 100%;
+    }
+    .reserve-band-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 700;
+      color: var(--charcoal);
+    }
+    .reserve-band-text em { font-style: italic; }
+    .btn-dark {
+      padding: 18px 44px;
+      background: var(--charcoal);
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: all 0.3s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-dark:hover { background: var(--charcoal-4); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--charcoal-2);
+      border-top: 1px solid rgba(201,168,76,0.12);
+      padding: 80px 60px 40px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .footer-brand span { font-style: italic; color: var(--cream); }
+    .footer-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--cream-dim);
+    }
+    .footer-heading {
+      font-size: 0.65rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a {
+      text-decoration: none;
+      color: var(--cream-dim);
+      font-size: 0.88rem;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-bottom {
+      padding-top: 32px;
+      border-top: 1px solid rgba(201,168,76,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--cream-dim);
+      opacity: 0.5;
+    }
+    .footer-socials { display: flex; gap: 16px; }
+    .social-btn {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(201,168,76,0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cream-dim);
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── REVEAL ANIMATION ── */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      nav.scrolled { padding: 14px 24px; }
+      .nav-links, .nav-reserve { display: none; }
+      section { padding: 80px 24px; }
+      .story { grid-template-columns: 1fr; gap: 50px; }
+      .featured-grid { grid-template-columns: 1fr 1fr; }
+      .quotes { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .reserve-band { flex-direction: column; gap: 24px; text-align: center; }
+      .about-strip { padding: 20px 24px; }
+      .featured-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    }
+    @media (max-width: 600px) {
+      .featured-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a class="nav-logo" href="index.html">Noir<span>&amp;Gold</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="product.html">Menu</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a class="nav-reserve" href="contact.html">Reserve a Table</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">✦ Est. 2009 · Fine Dining Experience ✦</span>
+    <h1 class="hero-title">
+      Where Taste<br>
+      <em>Becomes Art</em>
+    </h1>
+    <p class="hero-sub">Crafted flavours. Intimate atmosphere. Unforgettable evenings.</p>
+    <div class="hero-ctas">
+      <a href="product.html" class="btn-primary"><span>Explore the Menu</span></a>
+      <a href="contact.html" class="btn-outline">Reserve a Table</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- About Strip -->
+<div class="about-strip">
+  <div class="strip-item"><span class="strip-icon">⏰</span><span class="strip-text">Open Daily 12:00 – 23:00</span></div>
+  <span class="strip-sep">◆</span>
+  <div class="strip-item"><span class="strip-icon">📍</span><span class="strip-text">12 Rue des Artisans, Paris</span></div>
+  <span class="strip-sep">◆</span>
+  <div class="strip-item"><span class="strip-icon">📞</span><span class="strip-text">+33 1 42 86 00 00</span></div>
+  <span class="strip-sep">◆</span>
+  <div class="strip-item"><span class="strip-icon">⭐</span><span class="strip-text">Michelin Starred 2019–2026</span></div>
+  <span class="strip-sep">◆</span>
+  <div class="strip-item"><span class="strip-icon">🥂</span><span class="strip-text">Private Dining Available</span></div>
+</div>
+
+<!-- Story Section -->
+<section>
+  <div class="story">
+    <div class="story-visual reveal">
+      <div class="story-visual-inner">N&G</div>
+      <div class="story-frame"></div>
+      <div class="story-badge">
+        <div class="story-badge-num">17</div>
+        <div class="story-badge-label">Years of Mastery</div>
+      </div>
+    </div>
+    <div class="story-text reveal">
+      <span class="section-tag">✦ Our Story</span>
+      <h2 class="section-title">A Legacy Built on<br><em>Passion & Precision</em></h2>
+      <div class="ornament" style="justify-content:flex-start; margin-bottom: 28px;">
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line" style="max-width:80px;"></div>
+      </div>
+      <p class="section-body">
+        Founded in 2009 by Chef Arnaud Renoir, Noir &amp; Gold was born from a singular belief — that exceptional cuisine is an act of love. Each dish is a conversation between the finest seasonal ingredients and two decades of culinary craft.
+      </p>
+      <p class="section-body" style="margin-top: 20px;">
+        Our kitchen sources exclusively from small family farms within 200km of Paris, celebrating the terroir that makes French gastronomy unmatched in the world.
+      </p>
+      <div class="story-chef">
+        <div class="chef-avatar">👨‍🍳</div>
+        <div>
+          <div class="chef-name">Chef Arnaud Renoir</div>
+          <div class="chef-title">Founder & Executive Chef</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Menu -->
+<section class="featured">
+  <div class="featured-inner">
+    <div class="featured-header reveal">
+      <div>
+        <span class="section-tag">✦ Featured This Season</span>
+        <h2 class="section-title">Tonight's<br><em>Signature Plates</em></h2>
+      </div>
+      <a href="product.html" class="btn-outline">View Full Menu</a>
+    </div>
+    <div class="featured-grid">
+      <div class="dish-card reveal">
+        <div class="dish-emoji">🦞</div>
+        <div class="dish-overlay"></div>
+        <div class="dish-info">
+          <div class="dish-cat">Entrée</div>
+          <div class="dish-name">Bisque de Homard</div>
+          <div class="dish-price">€ 38</div>
+        </div>
+      </div>
+      <div class="dish-card reveal">
+        <div class="dish-emoji">🥩</div>
+        <div class="dish-overlay"></div>
+        <div class="dish-info">
+          <div class="dish-cat">Plat Principal</div>
+          <div class="dish-name">Wagyu Châteaubriand</div>
+          <div class="dish-price">€ 95</div>
+        </div>
+      </div>
+      <div class="dish-card reveal">
+        <div class="dish-emoji">🍮</div>
+        <div class="dish-overlay"></div>
+        <div class="dish-info">
+          <div class="dish-cat">Dessert</div>
+          <div class="dish-name">Soufflé au Grand Marnier</div>
+          <div class="dish-price">€ 22</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section>
+  <div class="testimonials reveal" style="max-width:1300px; margin:0 auto;">
+    <span class="section-tag">✦ Guest Experiences</span>
+    <h2 class="section-title">Words from Our<br><em>Treasured Guests</em></h2>
+    <div class="quotes">
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <p class="quote-text">"An evening that transcended dining. Every course told a story — I've never been so moved by food in my life."</p>
+        <div class="quote-author">— Sophie L., Paris</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <p class="quote-text">"The Châteaubriand was flawless. The sommelier's pairing with the Pomerol was the definition of perfection."</p>
+        <div class="quote-author">— Marcus T., London</div>
+      </div>
+      <div class="quote-card">
+        <div class="quote-stars">★★★★★</div>
+        <p class="quote-text">"Intimate, refined, extraordinary. We've visited three times and each meal surprises more than the last."</p>
+        <div class="quote-author">— Elena R., Milan</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Reservation Band -->
+<div class="reserve-band">
+  <div class="reserve-band-text">Ready for an <em>unforgettable</em> evening?</div>
+  <a href="contact.html" class="btn-dark">Reserve Your Table</a>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">Noir<span>&Gold</span></div>
+      <p class="footer-desc">Fine dining at the intersection of tradition and creativity. Nestled in the heart of Paris since 2009.</p>
+    </div>
+    <div>
+      <div class="footer-heading">Navigate</div>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html">Menu</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="contact.html">Reservations</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Cuisine</div>
+      <ul class="footer-links">
+        <li><a href="product.html">Entrées</a></li>
+        <li><a href="product.html">Plats Principaux</a></li>
+        <li><a href="product.html">Desserts</a></li>
+        <li><a href="product.html">Wine Cellar</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Hours</div>
+      <ul class="footer-links">
+        <li><a href="#">Mon – Fri: 12–15, 19–23</a></li>
+        <li><a href="#">Saturday: 12–23</a></li>
+        <li><a href="#">Sunday: 12–22</a></li>
+        <li><a href="contact.html">Private Events</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Noir & Gold. All rights reserved.</span>
+    <div class="footer-socials">
+      <a class="social-btn" href="#">f</a>
+      <a class="social-btn" href="#">in</a>
+      <a class="social-btn" href="#">ig</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+  });
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Navbar
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
